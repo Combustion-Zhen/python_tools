@@ -1,0 +1,16 @@
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
+
+# Unignore dirs
+!*/
+
+## Above combination ignore all files without extension
+
+# ignore output
+*.swp
+
+__pycache__
+.ipynb_checkpoints
