@@ -64,7 +64,10 @@ def ProgressVariableReactionRate( flame, speciesList ):
 
     v = VectorProgressVariableForMassFraction( flame.gas, speciesList )
 
-    omega = np.dot( flame.net_production_rates.transpose(), v )
+    massProductionRates = ( flame.net_production_rates.transpose() 
+                           * flame.gas.molecular_weights )
+
+    omega = np.dot( massProductionRates, v )
 
     return omega
 
