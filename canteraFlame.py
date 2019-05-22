@@ -75,7 +75,7 @@ def ScalarDissipationRateMixtureFraction( flame, fuel, oxidizer ):
 
     mixtureFraction = BilgerMixtureFraction( flame, fuel, oxidizer )
 
-    mixtureFractionGradient = np.gradient( Z, flame.grid )
+    mixtureFractionGradient = np.gradient( mixtureFraction, flame.grid )
 
     flame.transport_model = 'UnityLewis'
 
@@ -93,6 +93,20 @@ def StoichiometricMixtureFraction( fuel, oxidizer ):
     Zst = 1. / ( 1. + nu )
 
     return Zst
+
+def StoichiometricNuOxy( gas, fuel ):
+
+    atom_list = ['C', 'H', 'O']
+    atom_rate = [1, 0.25, -0.5]
+
+    index = gas.species_index(fuel)
+
+    nu = 0.
+    for i, atom in enumerate(atom_list):
+        if atom in gas.element_names:
+            nu += gas.n_atoms(index, atom) * atom_rate[i]
+
+    return nu
 
 def TakenoIndex( flame, fuelName, oxidizerName ):
 
@@ -147,3 +161,11 @@ def VectorProgressVariableForMassFraction( gas, speciesList ):
         v[gas.species_index(species)] = 1.
 
     return v
+
+def FlameThermalThickness( x, temp ):
+
+    temp_gradient = np.gradient(temp, x)
+    temp_gradient_max = temp_gradient.max()
+    delta = ( temp[-1] - temp[0] ) / temp_gradient_max
+
+    return delta
