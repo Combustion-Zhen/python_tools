@@ -52,6 +52,16 @@ def LagrangianFlameIndex( flame, fuel, oxidizer,
                            + magFlameBeta * magFluxMixtureFraction )
     return indexLagrangian
 
+def Le( flame ):
+
+    D = flame.mix_diff_coeffs
+    alpha = flame.thermal_conductivity / (flame.density*flame.cp)
+    Le = np.empty(D.shape)
+    for i, D_spe in enumerate(D):
+        Le[i] = alpha / D_spe
+
+    return Le
+
 def ProgressVariable( flame, speciesList ):
 
     v = VectorProgressVariableForMassFraction( flame.gas, speciesList )
