@@ -179,3 +179,13 @@ def FlameThermalThickness( x, temp ):
     delta = ( temp[-1] - temp[0] ) / temp_gradient_max
 
     return delta
+
+def FlameConsumptionSpeed( flame, fuelName ):
+
+    indexFuel = flame.gas.species_index( fuelName )
+
+    sc = - np.trapz(flame.net_production_rates[indexFuel], flame.grid) \
+         * flame.gas.molecular_weights[indexFuel] \
+         / ( flame.density[0] * flame.Y[indexFuel, 0] )
+
+    return sc
