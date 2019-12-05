@@ -87,7 +87,8 @@ def counterflow_premix_flame(
     f.products.mdot = m_b
 
     #f.set_refine_criteria(ratio=2.0, slope=0.015, curve=0.01, prune=0.002)
-    f.set_refine_criteria(ratio=2.0, slope=0.1, curve=0.2, prune=0.02)
+    #f.set_refine_criteria(ratio=2.0, slope=0.1, curve=0.2, prune=0.02)
+    f.set_refine_criteria(ratio=2.0, slope=0.02, curve=0.02, prune=0.002)
     f.set_max_grid_points(f.flame, 5000)
 
     # load saved case if presented

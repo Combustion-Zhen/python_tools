@@ -104,6 +104,26 @@ def StoichiometricMixtureFraction( fuel, oxidizer ):
 
     return Zst
 
+def StoichiometricNu( gas, stream ):
+
+    atom_list = ['C', 'H', 'O']
+    atom_rate = [1, 0.25, -0.5]
+
+    nu_stream = 0.
+
+    for k, v in stream.items():
+
+        index = gas.species_index(k)
+
+        nu = 0.
+        for i, atom in enumerate(atom_list):
+            if atom in gas.element_names:
+                nu += gas.n_atoms(index, atom) * atom_rate[i]
+
+        nu_stream += nu * v
+
+    return nu_stream
+
 def StoichiometricNuOxy( gas, fuel ):
 
     atom_list = ['C', 'H', 'O']
@@ -144,6 +164,37 @@ def TransportBudget( flame ):
     diffusion = convection - reaction
 
     return convection, diffusion, reaction
+
+def TwoStreamsMixture( gas, fuel, oxidizer, phi ):
+
+    # get stoichiometric coefficient
+
+    # fuel stream
+    nu_fuel = StoichiometricNu( gas, fuel )
+    if nu_fuel <= 0.:
+        raise ValueError('Fuel stream')
+
+    # oxidizer stream
+    nu_oxidizer = StoichiometricNu( gas, oxidizer )
+    if nu_oxidizer >= 0.:
+        raise ValueError('Oxidizer stream')
+
+    nu = -nu_fuel/nu_oxidizer
+
+    # construct mixture
+
+    mixture = {}
+    # add fuel
+    for k, v in fuel.items():
+        mixture[k] = v * phi
+    # add oxidizer
+    for k, v in oxidizer.items():
+        if k in mixture.keys():
+            mixture[k] += v * nu
+        else:
+            mixture[k] = v * nu
+
+    return mixture
 
 def VectorMixtureFractionForMassFraction( fuel, oxidizer ):
 

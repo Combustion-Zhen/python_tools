@@ -1,7 +1,53 @@
 import cantera as ct
 import numpy as np
 import argparse
+import canteraFlame as cf
 from filename import params2name
+
+def free_flame(
+        chemistry = 'gri30.xml',
+        transport = 'Mix',
+        fuel = {'CH4':1.},
+        oxidizer = {'O2':1., 'N2':3.76},
+        pressure = 1.,
+        temperature = 300.,
+        phi = 1.,
+        width = 0.05
+        ):
+
+    # for unrealistic parameters
+    if pressure < 0.:
+        raise ValueError('Negative pressure')
+    if temperature < 0.:
+        raise ValueError('Negative inlet temperature')
+    if phi < 0.:
+        raise ValueError('Negative equivalence ratio')
+    if width < 0.:
+        raise ValueError('Negative computational domain')
+
+    # supress log output
+    loglevel = 0
+
+    # object
+    gas = ct.Solution(chemistry)
+
+    # parameters
+    params = {}
+    params['p'] = pressure
+    params['T'] = temperature
+    params['eqv'] = phi
+
+    case = params2name(params)
+
+    # pressure, convert to [Pa]
+    p = pressure * ct.one_atm
+
+    # construct mixture
+    mixture = cf.TwoStreamsMixture( gas, fuel, oxidizer, phi )
+
+    print(mixture)
+
+    return 0
 
 def FreelyPropagatingFlame(
         mech = 'gri30.xml', transport = 'UnityLewis',
