@@ -6,13 +6,12 @@ from filename import params2name
 
 def free_flame(
         chemistry = 'gri30.xml',
-        transport = 'Mix',
         fuel = {'CH4':1.},
         oxidizer = {'O2':1., 'N2':3.76},
         pressure = 1.,
         temperature = 300.,
         phi = 1.,
-        width = 0.05
+        **kwargs
         ):
 
     # for unrealistic parameters
@@ -22,13 +21,46 @@ def free_flame(
         raise ValueError('Negative inlet temperature')
     if phi < 0.:
         raise ValueError('Negative equivalence ratio')
-    if width < 0.:
-        raise ValueError('Negative computational domain')
 
-    # supress log output
-    loglevel = 0
+    # read kwargs
+    if 'transport' in kwargs.keys():
+        transport = kwargs['transport']
+    else:
+        transport = 'Mix'
 
-    # object
+    if 'width' in kwargs.keys():
+        width = kwargs['width']
+    else:
+        width = 0.05,
+
+    if 'loglevel' in kwargs.keys():
+        loglevel = kwargs['loglevel']
+    else:
+        # supress log output
+        loglevel = 0
+
+    # kwargs for flame solver
+    if 'ct_ratio' in kwargs.keys():
+        ct_ratio = kwargs['ct_ratio']
+    else:
+        ct_ratio = 2.
+
+    if 'ct_slope' in kwargs.keys():
+        ct_slope = kwargs['ct_slope']
+    else:
+        ct_slope = 0.05
+
+    if 'ct_curve' in kwargs.keys():
+        ct_curve = kwargs['ct_curve']
+    else:
+        ct_curve = 0.05
+
+    if 'ct_prune' in kwargs.keys():
+        ct_prune = kwargs['ct_prune']
+    else:
+        ct_prune = 0.1
+
+    # gas object
     gas = ct.Solution(chemistry)
 
     # parameters
@@ -51,8 +83,11 @@ def free_flame(
     # flame object
     f = ct.FreeFlame( gas, width=width )
 
-    #f.set_refine_criteria(ratio=3, slope=0.06, curve=0.1, prune=0.01)
-    f.set_refine_criteria(ratio=3, slope=0.06, curve=0.1)
+    f.set_refine_criteria(ratio=ct_ratio, 
+                          slope=ct_slope, 
+                          curve=ct_curve,
+                          prune=ct_prune)
+
     f.soret_enabled = False
     f.radiation_enabled = False
 
