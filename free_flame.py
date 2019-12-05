@@ -45,7 +45,30 @@ def free_flame(
     # construct mixture
     mixture = cf.TwoStreamsMixture( gas, fuel, oxidizer, phi )
 
-    print(mixture)
+    # assigne inlet gas properties
+    gas.TPX = temperature, pressure, mixture
+
+    # flame object
+    f = ct.FreeFlame( gas, width=width )
+
+    #f.set_refine_criteria(ratio=3, slope=0.06, curve=0.1, prune=0.01)
+    f.set_refine_criteria(ratio=3, slope=0.06, curve=0.1)
+    f.soret_enabled = False
+    f.radiation_enabled = False
+
+    f.transport_model = transport
+
+    try:
+        f.solve( loglevel = loglevel, auto=True )
+    except Exception as e:
+        print('Error: not converge for case:',e)
+        return -1
+
+    # return for unburnt flame
+    if np.max(f.T) < temperature + 100. :
+        return 1
+
+    f.save('{}.xml'.format(case))
 
     return 0
 
