@@ -231,12 +231,33 @@ def FlameThermalThickness( x, temp ):
 
     return delta
 
-def FlameConsumptionSpeed( flame, fuelName ):
+def FlameConsumptionSpeed( flame, fuel ):
 
-    indexFuel = flame.gas.species_index( fuelName )
+    # check the fuel info
+    if isinstance( fuel, str ):
+        # single component
+        fuel_list = [fuel,]
+    elif isinstance( fuel, list ):
+        fuel_list = fuel
 
-    sc = - np.trapz(flame.net_production_rates[indexFuel], flame.grid) \
-         * flame.gas.molecular_weights[indexFuel] \
-         / ( flame.density[0] * flame.Y[indexFuel, 0] )
+    fuel_rate = np.zeros( len(fuel_list) )
+    fuel_mass = np.zeros( len(fuel_list) )
+
+    for i, s in enumerate(fuel_list):
+
+        # get species index
+        index = flame.gas.species_index( s )
+
+        # calculate fuel consumption
+        fuel_rate[i] = - ( np.trapz(flame.net_production_rates[index],
+                                    flame.grid)
+                          *flame.gas.molecular_weights[index] )
+        # fuel mass fraction in the inlet stream
+        fuel_mass[i] = flame.Y[index, 0]
+
+    fuel_rate_sum = np.sum( fuel_rate )
+    fuel_mass_sum = np.sum( fuel_mass )
+
+    sc = fuel_rate_sum / ( flame.density[0] * fuel_mass_sum )
 
     return sc
