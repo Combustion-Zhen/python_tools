@@ -48,31 +48,31 @@ def free_flame(
     if 'ct_slope' in kwargs.keys():
         ct_slope = kwargs['ct_slope']
     else:
-        ct_slope = 0.05
+        ct_slope = 0.02
 
     if 'ct_curve' in kwargs.keys():
         ct_curve = kwargs['ct_curve']
     else:
-        ct_curve = 0.05
+        ct_curve = 0.02
 
     if 'ct_prune' in kwargs.keys():
         ct_prune = kwargs['ct_prune']
     else:
-        ct_prune = 0.1
+        ct_prune = 0.005
 
     # gas object
     gas = ct.Solution(chemistry)
 
     # parameters
     params = {}
-    params['p'] = pressure
     params['T'] = temperature
-    params['eqv'] = phi
+    params['p'] = pressure
+    params['phi'] = phi
 
     case = params2name(params)
 
     # pressure, convert to [Pa]
-    p = pressure * ct.one_atm
+    pressure *= ct.one_atm
 
     # construct mixture
     mixture = cf.TwoStreamsMixture( gas, fuel, oxidizer, phi )
@@ -82,6 +82,8 @@ def free_flame(
 
     # flame object
     f = ct.FreeFlame( gas, width=width )
+
+    f.set_initial_guess(locs=np.linspace(0., 1., num=10))
 
     f.set_refine_criteria(ratio=ct_ratio, 
                           slope=ct_slope, 
@@ -94,7 +96,7 @@ def free_flame(
     f.transport_model = transport
 
     try:
-        f.solve( loglevel = loglevel, auto=True )
+        f.solve( loglevel=loglevel, auto=True )
     except Exception as e:
         print('Error: not converge for case:',e)
         return -1
