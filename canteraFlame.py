@@ -252,8 +252,9 @@ def FlameConsumptionSpeed( flame, fuel ):
         fuel_rate[i] = - ( np.trapz(flame.net_production_rates[index],
                                     flame.grid)
                           *flame.gas.molecular_weights[index] )
-        # fuel mass fraction in the inlet stream
-        fuel_mass[i] = flame.Y[index, 0]
+
+        # fuel mass fraction difference
+        fuel_mass[i] = flame.Y[index, 0] - flame.Y[index,-1]
 
     fuel_rate_sum = np.sum( fuel_rate )
     fuel_mass_sum = np.sum( fuel_mass )
