@@ -77,7 +77,7 @@ def free_flame(
     # construct mixture
     mixture = cf.TwoStreamsMixture( gas, fuel, oxidizer, phi )
 
-    # assigne inlet gas properties
+    # assign inlet gas properties
     gas.TPX = temperature, pressure, mixture
 
     # flame object
