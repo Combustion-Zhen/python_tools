@@ -262,3 +262,28 @@ def FlameConsumptionSpeed( flame, fuel ):
     sc = fuel_rate_sum / ( flame.density[0] * fuel_mass_sum )
 
     return sc
+
+def FuelConsumptionRate( flame, fuel ):
+
+    # check the fuel info
+    if isinstance( fuel, str ):
+        # single component
+        fuel_list = [fuel,]
+    elif isinstance( fuel, list ):
+        fuel_list = fuel
+
+    fuel_rate = np.zeros((len(fuel_list), flame.T.size))
+
+    for i, s, in enumerate(fuel_list):
+
+        # get species index
+        index = flame.gas.species_index( s )
+
+        fuel_rate[i] = (-flame.net_production_rates[index]
+                        *flame.gas.molecular_weights[index] )
+
+    fuel_consumption_rate = np.sum( fuel_rate, axis=0 ) 
+
+    return fuel_consumption_rate
+
+

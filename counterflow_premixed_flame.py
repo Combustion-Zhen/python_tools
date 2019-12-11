@@ -80,7 +80,7 @@ def counterflow_premixed_flame(
     if 'ct_max_grids' in kwargs.keys():
         ct_max_grids = kwargs['ct_max_grids']
     else:
-        ct_max_grids = 2000
+        ct_max_grids = 5000
 
 
     # case name
