@@ -109,6 +109,40 @@ def free_flame(
 
     return 0
 
+def export_premix(f, file_name='premix.dat', unit='cgs'):
+
+    # export cantera flame result in the form of premix output
+    # variable names    (A20)
+    # X, U, RHO, Y, T   (E20.10)
+
+    # unit system
+    # SI
+    convertor_length = 1.0
+    convertor_density = 1.0
+    # cgs
+    if unit == 'cgs':
+        convertor_length = 1.0E-02
+        convertor_density = 1.0E-03
+
+    # variale names
+    species_names =  f.gas.species_names
+    variable_names = ['X', 'U', 'RHO'] + species_names +['T',]
+    str_names = ''.join(['{:>20}'.format(n) for n in variable_names])
+
+    # data for output
+    data = np.zeros((f.grid.size, len(variable_names)))
+
+    data[:,0] = f.grid * convertor_length
+    data[:,1] = f.u * convertor_length
+    data[:,2] = f.density * convertor_density
+    data[:,3:-1] = f.Y.transpose()
+    data[:,-1] = f.T
+
+    np.savetxt(file_name, data, fmt='%20.10E', delimiter='', 
+               header=str_names, comments='')
+
+    return 0
+
 def FreelyPropagatingFlame(
         mech = 'gri30.xml', transport = 'UnityLewis',
         fuel_name = 'CH4', p = 1., T = 300., eqv = 1., width = 0.03):
