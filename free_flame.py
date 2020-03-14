@@ -121,7 +121,7 @@ def export_premix(f, file_name='premix.dat', unit='cgs'):
     convertor_density = 1.0
     # cgs
     if unit == 'cgs':
-        convertor_length = 1.0E-02
+        convertor_length = 1.0E+02
         convertor_density = 1.0E-03
 
     # variale names
